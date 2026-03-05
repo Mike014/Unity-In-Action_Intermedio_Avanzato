@@ -6,22 +6,25 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public class MouseLook : MonoBehaviour
 {
+    #region Enum Rotation
     // Enum come tipo esplicito — evita magic numbers e appare
     // come dropdown nell'Inspector. Valore di default = entrambi gli assi,
     // che è il caso d'uso più comune in un FPS.
     public enum RotationAxes { MouseXAndY, MouseX, MouseY }
+    #endregion
 
+    #region  Variables
     [SerializeField] private RotationAxes _axes = RotationAxes.MouseXAndY;
 
     // Header raggruppa visivamente le variabili nell'Inspector.
     // Utile quando il componente ha molti campi serializzati.
     [Header("Sensitivity")]
-    [SerializeField, Range(0.1f, 20f)] private float _sensitivityHor  = 9f;
+    [SerializeField, Range(0.1f, 20f)] private float _sensitivityHor = 9f;
     [SerializeField, Range(0.1f, 20f)] private float _sensitivityVert = 9f;
 
     [Header("Vertical Limits")]
-    [SerializeField, Range(-90f, 0f)]  private float _minimumVert = -45f;
-    [SerializeField, Range(0f,  90f)]  private float _maximumVert =  90f;
+    [SerializeField, Range(-90f, 0f)] private float _minimumVert = -45f;
+    [SerializeField, Range(0f, 90f)] private float _maximumVert = 90f;
 
     // Stato interno — non esposto. Solo questo script deve conoscerlo.
     private float _rotationX = 0f;
@@ -30,10 +33,21 @@ public class MouseLook : MonoBehaviour
     // ogni frame è una micro-ottimizzazione, ma è buona abitudine
     // in componenti che operano in Update().
     private Transform _transform;
+    #endregion
 
+    #region Monobehaviour Methods
     private void Awake()
     {
-        _transform = transform;
+        // Nasconde il cursore visivamente
+        Cursor.visible = false;
+
+        // Blocca il cursore al centro dello schermo.
+        // Locked: il cursore è invisibile e bloccato al centro — ideale per FPS.
+        // Confined: visibile ma non può uscire dalla finestra.
+        // None: libero, comportamento default.
+        Cursor.lockState = CursorLockMode.Locked;
+
+        _transform = transform; // Il transform di questo GameObject
 
         // FreezeRotation: se esiste un Rigidbody, la simulazione fisica
         // non deve sovrascrivere la rotazione controllata dal mouse.
@@ -59,8 +73,23 @@ public class MouseLook : MonoBehaviour
                 HandleBoth();
                 break;
         }
-    }
 
+        // Permette di recuperare il cursore durante il gioco.
+        // Utile per pause menu, debug, o qualsiasi UI.
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            // Cursor.visible = true;
+            // Cursor.lockState = CursorLockMode.None;
+            bool isLocked = Cursor.lockState == CursorLockMode.Locked;
+
+            Cursor.lockState = isLocked ? CursorLockMode.None : CursorLockMode.Locked;
+            Cursor.visible = isLocked ? true : false;
+        }
+
+    }
+    #endregion
+
+    #region  Handle Methods
     // Rotazione orizzontale — delega a Rotate() perché non ha limiti.
     // Space.Self: ruota attorno all'asse Y locale dell'oggetto,
     // non quello globale della scena. Corretto per un player FPS.
@@ -84,7 +113,7 @@ public class MouseLook : MonoBehaviour
         // Clamp impedisce di guardare oltre i limiti definiti.
         // Senza di esso potresti ruotare completamente a testa in giù.
         _rotationX = Mathf.Clamp(_rotationX, _minimumVert, _maximumVert);
-        
+
         // Debug
         // Debug.DrawLine(this.transform.position, transform.forward * 10f, Color.blue);
         // Debug.Log($"_rotationX è: {_rotationX}");
@@ -100,13 +129,15 @@ public class MouseLook : MonoBehaviour
     private void HandleBoth()
     {
         _rotationX -= Input.GetAxis("Mouse Y") * _sensitivityVert;
-        _rotationX  = Mathf.Clamp(_rotationX, _minimumVert, _maximumVert);
+        _rotationX = Mathf.Clamp(_rotationX, _minimumVert, _maximumVert);
 
-        float delta     = Input.GetAxis("Mouse X") * _sensitivityHor;
+        float delta = Input.GetAxis("Mouse X") * _sensitivityHor;
         float rotationY = _transform.localEulerAngles.y + delta;
 
         _transform.localEulerAngles = new Vector3(_rotationX, rotationY, 0f);
     }
+
+    #endregion 
 }
 
 /*
