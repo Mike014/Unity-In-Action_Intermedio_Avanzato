@@ -27,6 +27,7 @@ public class RayShooter : MonoBehaviour
     [Header("Physics Impact")]
     [SerializeField, Range(0f, 500f)] private float _impactForce = 100f;
 
+
     // Cache — GetComponent è costoso se chiamato ogni frame.
     // La camera è sul SAME GameObject grazie a RequireComponent.
     // Non serve FindAnyObjectByType — è fragile e lento.
@@ -129,9 +130,12 @@ public class RayShooter : MonoBehaviour
         // Quaternion.LookRotation: costruisce una rotazione che punta
         // nella direzione della normale — la sfera "emerge" dalla superficie.
         sphere.transform.position = position + normal * (_indicatorScale * .5f);
+        Debug.Log($"Lo Scale1 di Sphere è: {sphere.transform.localScale}");
         sphere.transform.rotation = Quaternion.LookRotation(normal);
-        sphere.transform.localScale = Vector3.one * _indicatorScale;
-
+        Debug.Log($"Lo Scale2 di Sphere è: {sphere.transform.localScale}");
+        sphere.transform.localScale = (Vector3.one * _indicatorScale / 3);
+        Debug.Log($"Lo Scale3 di Sphere è: {sphere.transform.localScale}");
+        
         // Rimuove il collider dalla sfera — non deve interferire
         // con raycast successivi o con la fisica della scena.
         if (sphere.TryGetComponent(out Collider col))
