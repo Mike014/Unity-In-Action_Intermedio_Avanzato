@@ -130,11 +130,11 @@ public class RayShooter : MonoBehaviour
         // Quaternion.LookRotation: costruisce una rotazione che punta
         // nella direzione della normale — la sfera "emerge" dalla superficie.
         sphere.transform.position = position + normal * (_indicatorScale * .5f);
-        Debug.Log($"Lo Scale1 di Sphere è: {sphere.transform.localScale}");
+        // Debug.Log($"Lo Scale1 di Sphere è: {sphere.transform.localScale}");
         sphere.transform.rotation = Quaternion.LookRotation(normal);
-        Debug.Log($"Lo Scale2 di Sphere è: {sphere.transform.localScale}");
+        // Debug.Log($"Lo Scale2 di Sphere è: {sphere.transform.localScale}");
         sphere.transform.localScale = (Vector3.one * _indicatorScale / 3);
-        Debug.Log($"Lo Scale3 di Sphere è: {sphere.transform.localScale}");
+        // Debug.Log($"Lo Scale3 di Sphere è: {sphere.transform.localScale}");
         
         // Rimuove il collider dalla sfera — non deve interferire
         // con raycast successivi o con la fisica della scena.

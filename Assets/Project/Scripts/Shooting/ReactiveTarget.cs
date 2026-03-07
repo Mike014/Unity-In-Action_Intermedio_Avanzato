@@ -22,6 +22,9 @@ public class ReactiveTarget : MonoBehaviour
         if (_isDying) return;
         _isDying = true;
 
+        if(TryGetComponent(out WanderingAI ai))
+           ai.SetAliveBool(false);
+
         // Disabilit il collider immediatamente
         // il raycast non puà più colpire questo oggetto
         if (TryGetComponent(out Collider col))
@@ -32,7 +35,7 @@ public class ReactiveTarget : MonoBehaviour
         StartCoroutine(Die());
     }
 
-    private IEnumerator Die()
+    public IEnumerator Die()
     {
         // Rotate istantaneo — il libro suggerisce tweens per
         // animazioni fluide come passo successivo (es. DOTween).
